@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <section class="ftco-section">
+        <div class="container">
+        
+            <div class="row justify-content-center">
+                <div class="col-md-7 col-lg-5">
+                  <div class="login-wrap p-4 p-md-5">
+                <div>
+                  <center><img src="{% static 'img/git.ico' %}" style="width: 140px; height: 140px;"></center>
+                </div>
+                <h3 class="text-center mb-4" style="color: gray; font-size: 35px;">Silva's Hub</h3>
+              
+              <form method="post">
+                {% csrf_token %}
+                {{form}}<br/>
+
+                <input class="form-control btn rounded submit px-3" style="background-color:#FF4500;font-family: Arial, Helvetica, sans-serif; font-size:smaller; color:white; font-size: 19px;" value="Login" type="submit">
+                <br/><br/>
+
+                <div>
+                  {% for message in messages %}                                    
+                    <p style="background-color:#ffc6ad; font-family: Arial, Helvetica, sans-serif; font-size:smaller; color:#FF4500; text-align: center; border-radius: 10px"><strong>{{message}}</strong></p>                                       
+                  {% endfor %}
+                </div>
+              </form>
+
+
+              <script>
+
+                document.getElementsByClassName("helptext")[0].innerHTML = ""
+
+                $('.helptext').remove()
+                $('label').remove();
+                
+                document.getElementById("id_password").type = "password"
+
+                document.getElementById("id_username").placeholder = "Username"
+                document.getElementById("id_password").placeholder = "Password"
+
+                document.getElementById("id_username").required = true
+                document.getElementById("id_password").required = true
+
+                document.getElementById("id_username").className = "form-control rounded-left"
+                document.getElementById("id_password").className = "form-control rounded-left"
+
+              </script>
+        </div>
+    </section>
+  {% endblock %}
