@@ -22,6 +22,73 @@
     .ipsulum{
       width: 50%;
     }
+
+    .label{
+      padding: 10px;
+      font-size: 18px;
+      color: #111;
+    }
+
+    .copy-text{
+      position: relative;
+      padding: 10px;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      display: flex;
+    }
+
+    .copy-text input.text{
+      padding: 10px;
+      font-size: 18px;
+      color: #555;
+      border: none;
+      outline: none;
+    }
+
+    .copy-text button{
+      padding: 10px;
+      background: #FF4500;
+      color: #fff;
+      font-size: 18px;
+      border: none;
+      outline: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .copy-text button:active{
+      background-color: #FF4500;
+    }
+
+    .copy-text button:before{
+      content: "Copied";
+      position: absolute;
+      top: -50px;
+      right: 0px;
+      background: #FF4500;
+      padding: 8px 10px;
+      border-radius: 20px;
+      font-size: 15px;
+      display: none;
+    }
+
+    .copy-text button:after{
+      content: "";
+      position: absolute;
+      top: -20px;
+      right: 25px;
+      width: 10px;
+      height: 10px;
+      background: #FF4500;
+      transform: rotate(45deg);
+      display: none;
+    }
+
+    .copy-text.active button:before,
+    .copy-text.active button::after{
+      display: block;
+    }
   </style>
 
   <body class="bg-light">
@@ -45,14 +112,32 @@
       </div>
     </div>
        
-        <form>
-         
+        <form method="post">
+            {% csrf_token %}
             <center>
-                <input type="text" class="form-control" id="firstName" style="width: 500px; height: 50px" placeholder="Nome do Repositório" value="" required=""><br/>
+                <input type="text" class="form-control" name="value" id="value" style="width: 500px; height: 50px" placeholder="Nome do Repositório" value="" required=""><br/>
                 <input class="form-control btn rounded submit px-3" style="background-color:#FF4500;font-family: Arial, Helvetica, sans-serif; font-size:smaller; color:white; font-size: 19px; width: 500px; height: 50px" value="Criar Repositório" type="submit">
             </center>
             
         </form>
+
+          <div><br/>
+            {% for message in messages %}                                    
+              <p style="background-color:#ffc6ad; font-family: Arial, Helvetica, sans-serif; font-size:smaller; color:#FF4500; text-align: center; border-radius: 10px; margin-left: 450px; margin-right: 450px;"><strong>{{message}}</strong></p>                                       
+            {% endfor %}
+          </div>
+        
+          {% if url is not None %}
+            <br/>
+            <center>
+            <div class="copy-text" style="width: 720px;">
+              <input type="text" class="text" value="git remote add origin {{url}}" style="width: 900px;">
+              <button style="border-right: 500px;">
+                <i class="fa fa-clone"></i>
+              </button>
+            </div>
+            </center>
+          {% endif %}
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
@@ -62,26 +147,19 @@
     <script src="../../dist/js/bootstrap.min.js"></script>
     <script src="../../assets/js/vendor/holder.min.js"></script>
     <script>
-      // Example starter JavaScript for disabling form submissions if there are invalid fields
-      (function() {
-        'use strict';
+      let copyText = document.querySelector(".copy-text");
+      copyText.querySelector("button").addEventListener("click", function(){
 
-        window.addEventListener('load', function() {
-          // Fetch all the forms we want to apply custom Bootstrap validation styles to
-          var forms = document.getElementsByClassName('needs-validation');
+        let input = copyText.querySelector("input.text");
+        input.select();
+        document.execCommand("copy")
+        copyText.classList.add("active")
+        window.getSelection().removeAllRanges();
 
-          // Loop over them and prevent submission
-          var validation = Array.prototype.filter.call(forms, function(form) {
-            form.addEventListener('submit', function(event) {
-              if (form.checkValidity() === false) {
-                event.preventDefault();
-                event.stopPropagation();
-              }
-              form.classList.add('was-validated');
-            }, false);
-          });
-        }, false);
-      })();
+        setTimeout(function(){
+          copyText.classList.remove("active");
+        }, 1000);
+      });
     </script>
   
 
