@@ -27,12 +27,13 @@ class LoginView(ListView):
     model = User
     
     def get(self, request):
+        repositorio = Repository.objects.all()
 
         form = UserForm()
       
         if request.user.is_authenticated:
             #return HttpResponseRedirect(reverse('/git/painel'))
-            return render(request, 'painel.html', {'username': request.user.username})
+            return render(request, 'painel.html', {'username': request.user.username, "repositorios": repositorio})
 
         return render(request, self.template_name, {'form': form})
 
@@ -67,30 +68,40 @@ class PainelView(ListView):
         return render(request, self.template_name, context)
 
     def post(self, request):
+        name = request.POST.get('id')
+        repositorio = Repository.objects.all()
+
         env = environ.Env()
         environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
-        input_value = request.POST.get('value')
-        
-        status, is_pupkey = RepositoryManager.new_repository(input_value)
+        print(name)
 
-        url = f'{env("GIT_USER")}@{env("DOMAIN")}:{env("GIT_PATH")}/{input_value}.{env("REPO_EXTENTION")}'
+        if name is None:    
 
-        if status and is_pupkey:
+            input_value = request.POST.get('value')
 
-            messages.info(request,'Chave pública adicionada com sucesso!')
-            return render(request, self.template_name, {'username': request.user.username})
+            status, is_pupkey = RepositoryManager.new_repository(input_value)
 
-        elif status and not is_pupkey:  
+            url = f'{env("GIT_USER")}@{env("DOMAIN")}:{env("GIT_PATH")}/{input_value}.{env("REPO_EXTENTION")}'
+
+            if status and is_pupkey:
+
+                messages.info(request,'Chave pública adicionada com sucesso!')
+                return render(request, self.template_name, {'username': request.user.username, "repositorios": repositorio})
+
+            elif status and not is_pupkey:  
+
+                context = {'url': url, 'username': request.user.username, "repositorios": repositorio}
+
+                return render(request, self.template_name, context)
+
+            else:
             
-            repositorio = Repository.objects.all()
-            context = {'url': url, 'username': request.user.username, "repositorios": repositorio}
-
-            return render(request, self.template_name, context)
-
+                messages.info(request,'Erro no processo!')
+                return render(request, self.template_name, {'username': request.user.username, "repositorios": repositorio})
         else:
-        
-            messages.info(request,'Erro no processo!')
-            return render(request, self.template_name, {'username': request.user.username})
-
+            
+            url = f'{env("GIT_USER")}@{env("DOMAIN")}:{env("GIT_PATH")}/{name}.{env("REPO_EXTENTION")}'
+            return HttpResponse(url)
+            
 # Create your views here.

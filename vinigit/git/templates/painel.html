@@ -126,22 +126,21 @@
               <p style="background-color:#ffc6ad; font-family: Arial, Helvetica, sans-serif; font-size:smaller; color:#FF4500; text-align: center; border-radius: 10px; margin-left: 450px; margin-right: 450px;"><strong>{{message}}</strong></p>                                       
             {% endfor %}
           </div>
-        
-          {% if url is not None %}
-            <br/>
-            <center>
-            <div class="copy-text copy-text" style="width: 720px;">
-              <input id="url" type="text" class="text" value="git remote add origin {{url}}" style="width: 900px;">
-              <button style="border-right: 500px;">
-                <i class="fa fa-clone"></i>
-              </button>
-            </div>
-            </center>
-          {% endif %}
           
-          <input type="hidden" class="text" id="input_hidden" style="width: 900px;">
-
-          <div class="row" style="margin-left: 75px; margin-top: 40px">
+          <center>
+          <div id="input_container" class="copy-text copy-text" style="width: 720px;">
+          
+            {% if url is not None %}
+            
+                <br/>
+                <input id="url" type="text" class="text" value="git remote add origin {{url}}" style="width: 900px;">
+                <button id="botao" style="border-right: 500px;">
+                  <i class="fa fa-clone"></i>
+                </button>
+            {% endif %}      
+          </div>
+        </center> 
+          <div class="row" style="margin-left: auto; margin-top: 40px">
 
             {% for repositorio in repositorios %}
 
@@ -157,16 +156,14 @@
                       </button>
                     
                       <button id="{{repositorio.nome}}" type="button" class="btn text-white" style="background-color: #FF4500;">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-files" viewBox="0 0 16 16">
-                              <path d="M13 0H6a2 2 0 0 0-2 2 2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2 2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm0 13V4a2 2 0 0 0-2-2H5a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1zM3 4a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4z"></path>
-                          </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-code" viewBox="0 0 16 16">
+                          <path d="M5.854 4.854a.5.5 0 1 0-.708-.708l-3.5 3.5a.5.5 0 0 0 0 .708l3.5 3.5a.5.5 0 0 0 .708-.708L2.707 8l3.147-3.146zm4.292 0a.5.5 0 0 1 .708-.708l3.5 3.5a.5.5 0 0 1 0 .708l-3.5 3.5a.5.5 0 0 1-.708-.708L13.293 8l-3.147-3.146z"/>
+                        </svg>
                       </button>
                       </center>    
                   </div>
                 </div>      
-
             {% endfor %}
-
         </div>
 
     <!-- Bootstrap core JavaScript
@@ -177,19 +174,30 @@
     <script src="../../assets/js/vendor/popper.min.js"></script>
     <script src="../../dist/js/bootstrap.min.js"></script>
     <script src="../../assets/js/vendor/holder.min.js"></script>
-    <script>
-      $( "button" ).click(function() {
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 
-        if(typeof this.id==='number'){
-          $.post( "ajax/test.html", function( data ) {
-            $( ".result" ).html( data );
-          });
-          alert('oi')
-        }else{
-            $("#input_hidden").text("asdoifjasdopfj")
-            let input = copyText.querySelector("#input_hidden.text");
-            
-            console.log(input)
+    <script>
+      window.CSRF_TOKEN = "{{ csrf_token }}"
+      $(".text-white:button").click(function() {
+      //  $.post("/painel", {id: this.id, csrfmiddlewaretoken: window.CSRF_TOKEN}, function(response){
+      //    
+      //  })
+      //});
+        $.post("/painel", {id: this.id, csrfmiddlewaretoken: window.CSRF_TOKEN}, function(response) {
+          $("#url").remove()
+          $("#botao").remove()
+          $("#item_click").remove()
+          $("#br_value").remove()
+
+          command = response
+          
+          $("#input_container").append(
+            '<br id="br_value"/><input id="url" type="text" class="text" value='+ command +' style="width: 900px;"><button id="botao" style="border-right: 500px;"><i id="item_click" class="fa fa-clone"></i></button>')
+          
+            let copyText = document.querySelector(".copy-text");
+            copyText.querySelector("#botao").addEventListener("click", function(){
+
+            let input = copyText.querySelector("#url.text");
             input.select();
             document.execCommand("copy")
             copyText.classList.add("active")
@@ -197,14 +205,13 @@
 
             setTimeout(function(){
               copyText.classList.remove("active");
-            }, 1000)
-
-            alert('oi')
-        }
-      });
+            }, 1000);
+          });
+        });
+      })
 
       let copyText = document.querySelector(".copy-text");
-      copyText.querySelector("button").addEventListener("click", function(){
+      copyText.querySelector("#botao").addEventListener("click", function(){
 
         let input = copyText.querySelector("#url.text");
         input.select();
