@@ -9,6 +9,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib import messages
 from git.managers import RepositoryManager
 from git.forms import UserForm
+from git.models import Repository
 
 class LogoutView(ListView):
     template_name = 'auth/login.html'
@@ -18,6 +19,7 @@ class LogoutView(ListView):
 
         logout(request=request)
         return redirect('/')
+        #return render(request, self.template_name)
 
 
 class LoginView(ListView):
@@ -29,8 +31,8 @@ class LoginView(ListView):
         form = UserForm()
       
         if request.user.is_authenticated:
-            return HttpResponseRedirect(reverse('painel'))
-            #return render(request, 'index.html', {'username': request.user.username})
+            #return HttpResponseRedirect(reverse('/git/painel'))
+            return render(request, 'painel.html', {'username': request.user.username})
 
         return render(request, self.template_name, {'form': form})
 
@@ -48,17 +50,21 @@ class LoginView(ListView):
             if user is not None:
                 login(request, user)
 
-                return HttpResponseRedirect(reverse('painel'))
+                return redirect('/painel')
 
         messages.info(request,'Credenciais incorretas')
         return render(request, self.template_name, {'form': form})
 
 
 class PainelView(ListView):
-    template_name = 'index.html'
+    template_name = 'painel.html'
 
     def get(self, request):
-        return render(request, self.template_name, {'username': request.user.username})
+
+        repositorio = Repository.objects.all()
+        context = {'username': request.user.username, "repositorios": repositorio}
+       
+        return render(request, self.template_name, context)
 
     def post(self, request):
         env = environ.Env()
@@ -76,8 +82,11 @@ class PainelView(ListView):
             return render(request, self.template_name, {'username': request.user.username})
 
         elif status and not is_pupkey:  
-        
-            return render(request, self.template_name, {'url': url, 'username': request.user.username})
+            
+            repositorio = Repository.objects.all()
+            context = {'url': url, 'username': request.user.username, "repositorios": repositorio}
+
+            return render(request, self.template_name, context)
 
         else:
         

@@ -1,0 +1,223 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+  <style>
+    .conteudo {
+      display:flex; /*<--*/
+    }
+
+    .div{
+      width: 50%;
+      background-color: #FF4500; 
+      height: 41px; 
+      width: 50%; 
+      border-top: 0px;
+    }
+    .tooltip {
+      position: relative;
+      display: inline-block;
+      border-bottom: 1px dotted black;
+    }
+    .ipsulum{
+      width: 50%;
+    }
+
+    .label{
+      padding: 10px;
+      font-size: 18px;
+      color: #111;
+    }
+
+    .copy-text{
+      position: relative;
+      padding: 10px;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      display: flex;
+    }
+
+    .copy-text input.text{
+      padding: 10px;
+      font-size: 18px;
+      color: #555;
+      border: none;
+      outline: none;
+    }
+
+    .copy-text button{
+      padding: 10px;
+      background: #FF4500;
+      color: #fff;
+      font-size: 18px;
+      border: none;
+      outline: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .copy-text button:active{
+      background-color: #FF4500;
+    }
+
+    .copy-text button:before{
+      content: "Copiado";
+      position: absolute;
+      top: -50px;
+      right: 0px;
+      background: #FF4500;
+      padding: 8px 10px;
+      border-radius: 20px;
+      font-size: 15px;
+      display: none;
+    }
+
+    .copy-text button:after{
+      content: "";
+      position: absolute;
+      top: -20px;
+      right: 25px;
+      width: 10px;
+      height: 10px;
+      background: #FF4500;
+      transform: rotate(45deg);
+      display: none;
+    }
+
+    .copy-text.active button:before,
+    .copy-text.active button::after{
+      display: block;
+    }
+  </style>
+
+  <body class="bg-light">
+    <div class="conteudo">
+    <div class="div">
+      <div style="margin-left: -570px">
+        <a href="#"><img class="d-block mx-auto mb-4" src="{% static 'img/git.png' %}" alt="" width="38" height="38"></a>
+      </div>
+    </div>
+    
+    <div class="div">
+      <div style="margin-left: 570px">
+        <a href="/logout"><img class="d-block mx-auto mb-4" src="{% static 'img/user.png' %}" alt="" width="60" height="40"></a>
+      </div>
+    </div>  
+    </div>
+    </div>
+    <div class="container">  
+      <div class="py-2 text-center">
+        <h2 class="text-center mb-1" style="color: gray;">Bem vindo(a) {{username}}</h2>
+      </div>
+    </div>
+       
+        <form method="POST" action="/painel">
+            {% csrf_token %}
+            <center>
+                <input type="text" class="form-control" name="value" id="value" style="width: 500px; height: 50px" placeholder="Nome do Repositório ou Chave pública" value="" required=""><br/>
+                <input class="form-control btn rounded submit px-3" style="background-color:#FF4500;font-family: Arial, Helvetica, sans-serif; font-size:smaller; color:white; font-size: 19px; width: 500px; height: 50px" value="Enviar" type="submit">
+            </center>
+            
+        </form>
+
+          <div><br/>
+            {% for message in messages %}                                    
+              <p style="background-color:#ffc6ad; font-family: Arial, Helvetica, sans-serif; font-size:smaller; color:#FF4500; text-align: center; border-radius: 10px; margin-left: 450px; margin-right: 450px;"><strong>{{message}}</strong></p>                                       
+            {% endfor %}
+          </div>
+        
+          {% if url is not None %}
+            <br/>
+            <center>
+            <div class="copy-text copy-text" style="width: 720px;">
+              <input id="url" type="text" class="text" value="git remote add origin {{url}}" style="width: 900px;">
+              <button style="border-right: 500px;">
+                <i class="fa fa-clone"></i>
+              </button>
+            </div>
+            </center>
+          {% endif %}
+          
+          <input type="hidden" class="text" id="input_hidden" style="width: 900px;">
+
+          <div class="row" style="margin-left: 75px; margin-top: 40px">
+
+            {% for repositorio in repositorios %}
+
+                <div class="card d-inline" style="width:300px; height: 200px; margin: 10px;">
+                  <div class="card-body" style="margin-top: 10px">
+                    <center>
+                    <h3 class="card-text" style="color: gray; padding: 10px">{{repositorio.nome}}</h3>
+                      <button id="{{repositorio.id}}" type="button" class="btn btn-danger">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                              <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"></path>
+                              <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"></path>
+                          </svg>
+                      </button>
+                    
+                      <button id="{{repositorio.nome}}" type="button" class="btn text-white" style="background-color: #FF4500;">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-files" viewBox="0 0 16 16">
+                              <path d="M13 0H6a2 2 0 0 0-2 2 2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2 2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm0 13V4a2 2 0 0 0-2-2H5a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1zM3 4a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4z"></path>
+                          </svg>
+                      </button>
+                      </center>    
+                  </div>
+                </div>      
+
+            {% endfor %}
+
+        </div>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery-slim.min.js"><\/script>')</script>
+    <script src="../../assets/js/vendor/popper.min.js"></script>
+    <script src="../../dist/js/bootstrap.min.js"></script>
+    <script src="../../assets/js/vendor/holder.min.js"></script>
+    <script>
+      $( "button" ).click(function() {
+
+        if(typeof this.id==='number'){
+          $.post( "ajax/test.html", function( data ) {
+            $( ".result" ).html( data );
+          });
+          alert('oi')
+        }else{
+            $("#input_hidden").text("asdoifjasdopfj")
+            let input = copyText.querySelector("#input_hidden.text");
+            
+            console.log(input)
+            input.select();
+            document.execCommand("copy")
+            copyText.classList.add("active")
+            window.getSelection().removeAllRanges();
+
+            setTimeout(function(){
+              copyText.classList.remove("active");
+            }, 1000)
+
+            alert('oi')
+        }
+      });
+
+      let copyText = document.querySelector(".copy-text");
+      copyText.querySelector("button").addEventListener("click", function(){
+
+        let input = copyText.querySelector("#url.text");
+        input.select();
+        document.execCommand("copy")
+        copyText.classList.add("active")
+        window.getSelection().removeAllRanges();
+
+        setTimeout(function(){
+          copyText.classList.remove("active");
+        }, 1000);
+      });
+    </script>
+  
+
+</body>
+{% endblock %}

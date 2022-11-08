@@ -25,9 +25,11 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 SECRET_KEY = 'django-insecure-y5sua6!35jb1@7^wo&t5i76&yoffn+de2k+ji(qn-cx2xdnybz'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env('DEBUG').strip()
+DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
+
+#CSRF_TRUSTED_ORIGINS = ['127.0.0.1']
 
 AUTHENTICATION_BACKENDS = ( ('django.contrib.auth.backends.ModelBackend'),)
 # Application definition
