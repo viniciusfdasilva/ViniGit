@@ -178,11 +178,20 @@
 
     <script>
       window.CSRF_TOKEN = "{{ csrf_token }}"
+
+      $(".btn-danger:button").click(function() {
+        $('#modal').modal('show')
+        $('#button_modal').val(this.id)
+      })
+
+      function remove(){
+        $.post("/painel", {id_repo: $('#button_modal').val(), csrfmiddlewaretoken: window.CSRF_TOKEN}, function(response) {
+          alert(response)
+          location.href = ""
+        })
+      }
+
       $(".text-white:button").click(function() {
-      //  $.post("/painel", {id: this.id, csrfmiddlewaretoken: window.CSRF_TOKEN}, function(response){
-      //    
-      //  })
-      //});
         $.post("/painel", {id: this.id, csrfmiddlewaretoken: window.CSRF_TOKEN}, function(response) {
           $("#url").remove()
           $("#botao").remove()
@@ -224,7 +233,25 @@
         }, 1000);
       });
     </script>
-  
 
+    <div id="modal" class="modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Excluir repositório</h5>
+            <a href="" type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </a>
+          </div>
+          <div class="modal-body">
+            <center><span>Tem certeza que deseja remover este repositório?</span></center>
+          </div>
+          <div class="modal-footer">
+            <button id="button_modal" onclick="remove()" type="button" class="btn text-white" style="background-color: #FF4500;">Sim</button>
+            <a href="" type="button" class="btn btn-secondary" data-dismiss="modal">Não</a>
+          </div>
+        </div>
+      </div>
+    </div>
 </body>
 {% endblock %}

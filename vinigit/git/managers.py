@@ -4,6 +4,21 @@ from git.models import Repository
 
 class RepositoryManager():
     
+    def remove_repository(id):
+        env = environ.Env()
+        environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+        
+        rep = Repository.objects.get(pk=id)
+        
+        try:
+           
+            path = f'{env("GIT_PATH")}/{rep.nome}.{env("REPO_EXTENTION")}'
+            os.system(f'rm -r {path}')
+            rep.delete()
+        except OSError as e:
+            
+            rep.delete()
+
     def new_repository(input_value):
         env = environ.Env()
         environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
@@ -17,13 +32,12 @@ class RepositoryManager():
                 mode = 0o777
                 directory = f'{env("GIT_PATH")}/{input_value}.{env("REPO_EXTENTION")}'
 
-                Repository(nome=input_value).save()
-
                 os.makedirs(directory, mode)
                 os.chdir(directory)
                 os.system('git init --bare')
 
+                Repository(nome=input_value).save()
+
                 return True, False
         except OSError as e:
-            print(e)
             return False, False

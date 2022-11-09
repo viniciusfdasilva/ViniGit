@@ -69,17 +69,17 @@ class PainelView(ListView):
 
     def post(self, request):
         name = request.POST.get('id')
+        repo = request.POST.get('id_repo')
         repositorio = Repository.objects.all()
 
         env = environ.Env()
         environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
-        print(name)
-
-        if name is None:    
+        if name is None and repo is None:    
 
             input_value = request.POST.get('value')
 
+            print(f'[82] PASSOU POR AQUI {input_value}')
             status, is_pupkey = RepositoryManager.new_repository(input_value)
 
             url = f'{env("GIT_USER")}@{env("DOMAIN")}:{env("GIT_PATH")}/{input_value}.{env("REPO_EXTENTION")}'
@@ -99,8 +99,13 @@ class PainelView(ListView):
             
                 messages.info(request,'Erro no processo!')
                 return render(request, self.template_name, {'username': request.user.username, "repositorios": repositorio})
+        
+        elif repo is not None and name is None:
+            print('entrou')
+            RepositoryManager.remove_repository(repo)
+            return HttpResponse('Repositório removido com sucesso!')
         else:
-            
+
             url = f'{env("GIT_USER")}@{env("DOMAIN")}:{env("GIT_PATH")}/{name}.{env("REPO_EXTENTION")}'
             return HttpResponse(url)
             
