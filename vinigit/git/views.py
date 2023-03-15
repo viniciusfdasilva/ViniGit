@@ -9,6 +9,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib import messages
 from git.managers import RepositoryManager
 from git.forms import UserForm
+from git.models import Repository
 
 class LogoutView(ListView):
     template_name = 'auth/login.html'
@@ -17,7 +18,8 @@ class LogoutView(ListView):
     def get(self, request):
 
         logout(request=request)
-        return redirect('/')
+        return redirect('/git/')
+        #return render(request, self.template_name)
 
 
 class LoginView(ListView):
@@ -25,12 +27,13 @@ class LoginView(ListView):
     model = User
     
     def get(self, request):
+        repositorio = Repository.objects.all()
 
         form = UserForm()
       
         if request.user.is_authenticated:
-            return HttpResponseRedirect(reverse('painel'))
-            #return render(request, 'index.html', {'username': request.user.username})
+            #return HttpResponseRedirect(reverse('/git/painel'))
+            return render(request, 'painel.html', {'username': request.user.username, "repositorios": repositorio})
 
         return render(request, self.template_name, {'form': form})
 
@@ -48,40 +51,62 @@ class LoginView(ListView):
             if user is not None:
                 login(request, user)
 
-                return HttpResponseRedirect(reverse('painel'))
+                return redirect('/git/painel')
 
         messages.info(request,'Credenciais incorretas')
         return render(request, self.template_name, {'form': form})
 
 
 class PainelView(ListView):
-    template_name = 'index.html'
+    template_name = 'painel.html'
 
     def get(self, request):
-        return render(request, self.template_name, {'username': request.user.username})
+
+        repositorio = Repository.objects.all()
+        context = {'username': request.user.username, "repositorios": repositorio}
+       
+        return render(request, self.template_name, context)
 
     def post(self, request):
+        name = request.POST.get('id')
+        repo = request.POST.get('id_repo')
+        repositorio = Repository.objects.all()
+
         env = environ.Env()
         environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
-        input_value = request.POST.get('value')
+        if name is None and repo is None:    
+
+            input_value = request.POST.get('value')
+
+            print(f'[82] PASSOU POR AQUI {input_value}')
+            status, is_pupkey = RepositoryManager.new_repository(input_value)
+
+            url = f'{env("GIT_USER")}@{env("DOMAIN")}:{env("GIT_PATH")}/{input_value}.{env("REPO_EXTENTION")}'
+
+            if status and is_pupkey:
+
+                messages.info(request,'Chave pública adicionada com sucesso!')
+                return render(request, self.template_name, {'username': request.user.username, "repositorios": repositorio})
+
+            elif status and not is_pupkey:  
+
+                context = {'url': url, 'username': request.user.username, "repositorios": repositorio}
+
+                return render(request, self.template_name, context)
+
+            else:
+            
+                messages.info(request,'Erro no processo!')
+                return render(request, self.template_name, {'username': request.user.username, "repositorios": repositorio})
         
-        status, is_pupkey = RepositoryManager.new_repository(input_value)
-
-        url = f'{env("GIT_USER")}@{env("DOMAIN")}:{env("GIT_PATH")}/{input_value}.{env("REPO_EXTENTION")}'
-
-        if status and is_pupkey:
-
-            messages.info(request,'Chave pública adicionada com sucesso!')
-            return render(request, self.template_name, {'username': request.user.username})
-
-        elif status and not is_pupkey:  
+        elif repo is not None and name is None:
         
-            return render(request, self.template_name, {'url': url, 'username': request.user.username})
-
+            RepositoryManager.remove_repository(repo)
+            return HttpResponse('Repositório removido com sucesso!')
         else:
-        
-            messages.info(request,'Erro no processo!')
-            return render(request, self.template_name, {'username': request.user.username})
 
+            url = f'{env("GIT_USER")}@{env("DOMAIN")}:{env("GIT_PATH")}/{name}.{env("REPO_EXTENTION")}'
+            return HttpResponse(url)
+            
 # Create your views here.

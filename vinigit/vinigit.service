@@ -1,0 +1,10 @@
+[Unit]
+Description=vinigit
+
+[Service]
+User=root
+ExecStart=python /app/vinigit/manage.py runserver 8002
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
