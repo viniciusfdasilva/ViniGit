@@ -101,11 +101,7 @@
     
     <div class="div">
       <div style="margin-left: 570px">
-<<<<<<< HEAD
-        <a href="/logout"><img class="d-block mx-auto mb-4" src="{% static 'img/user.png' %}" alt="" width="60" height="40"></a>
-=======
         <a href="/git/logout"><img class="d-block mx-auto mb-4" src="{% static 'img/user.png' %}" alt="" width="60" height="40"></a>
->>>>>>> main
       </div>
     </div>  
     </div>
@@ -116,11 +112,7 @@
       </div>
     </div>
        
-<<<<<<< HEAD
-        <form method="POST" action="/painel">
-=======
         <form method="POST" action="/git/painel">
->>>>>>> main
             {% csrf_token %}
             <center>
                 <input type="text" class="form-control" name="value" id="value" style="width: 500px; height: 50px" placeholder="Nome do Repositório ou Chave pública" value="" required=""><br/>
@@ -138,40 +130,7 @@
           <center>
           <div id="input_container" class="copy-text copy-text" style="width: 720px;">
           
-            {% if url is not None %}
             
-                <br/>
-                <input id="url" type="text" class="text" value="git remote add origin {{url}}" style="width: 900px;">
-                <button id="botao" style="border-right: 500px;">
-                  <i class="fa fa-clone"></i>
-                </button>
-            {% endif %}      
-          </div>
-        </center> 
-          <div class="row" style="margin-left: auto; margin-top: 40px">
-
-            {% for repositorio in repositorios %}
-
-                <div class="card d-inline" style="width:300px; height: 200px; margin: 10px;">
-                  <div class="card-body" style="margin-top: 10px">
-                    <center>
-                    <h3 class="card-text" style="color: gray; padding: 10px">{{repositorio.nome}}</h3>
-                      <button id="{{repositorio.id}}" type="button" class="btn btn-danger">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
-                              <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"></path>
-                              <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"></path>
-                          </svg>
-                      </button>
-                    
-                      <button id="{{repositorio.nome}}" type="button" class="btn text-white" style="background-color: #FF4500;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-code" viewBox="0 0 16 16">
-                          <path d="M5.854 4.854a.5.5 0 1 0-.708-.708l-3.5 3.5a.5.5 0 0 0 0 .708l3.5 3.5a.5.5 0 0 0 .708-.708L2.707 8l3.147-3.146zm4.292 0a.5.5 0 0 1 .708-.708l3.5 3.5a.5.5 0 0 1 0 .708l-3.5 3.5a.5.5 0 0 1-.708-.708L13.293 8l-3.147-3.146z"/>
-                        </svg>
-                      </button>
-                      </center>    
-                  </div>
-                </div>      
-            {% endfor %}
         </div>
 
     <!-- Bootstrap core JavaScript

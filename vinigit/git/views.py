@@ -9,7 +9,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib import messages
 from git.managers import RepositoryManager
 from git.forms import UserForm
-from git.models import Repository
+from git.models import Repository, PullRequest, Release
 
 class LogoutView(ListView):
     template_name = 'auth/login.html'
@@ -18,10 +18,55 @@ class LogoutView(ListView):
     def get(self, request):
 
         logout(request=request)
-        return redirect('/')
+        return redirect('/git/')
         #return render(request, self.template_name)
 
 
+class ReleaseDetailView(ListView):
+    
+    template_name = 'release_detail.html'
+    
+    def get(self, request, repository=None, id_release=None):
+        pass
+    
+class PullRequestDetailView(ListView):
+    template_name = 'pullrequest_detail.html'
+
+    def get(self, request, repository=None, id_pullrequest=None):
+        pass
+class ReleaseView(ListView):
+    
+    template_name = 'releases.html'
+    
+    def get(self, request, repository=None):
+        
+        if repository:
+            
+            rep = Repository.objects.get(name=repository)
+            
+            if rep:
+                
+                releases = Release.objects.filter(repository=rep)
+                return render(request, self.template_name, {'releases': releases})
+
+        return HttpResponse('Não encontrado!')
+    
+class PullRequestView(ListView):
+    template_name = 'pull_request.html'
+
+    def get(self, request,  repository=None):
+        
+        if repository:
+            
+            rep = Repository.objects.get(name=repository)
+            
+            if rep:
+                
+                pull_requests = PullRequest.objects.filter(repository=rep)
+                return render(request, self.template_name, {'pull_requests': pull_requests})
+
+        return HttpResponse('Não encontrado!')
+        
 class LoginView(ListView):
     template_name = 'auth/login.html'
     model = User
@@ -51,7 +96,7 @@ class LoginView(ListView):
             if user is not None:
                 login(request, user)
 
-                return redirect('/painel')
+                return redirect('/git/painel')
 
         messages.info(request,'Credenciais incorretas')
         return render(request, self.template_name, {'form': form})
@@ -79,7 +124,6 @@ class PainelView(ListView):
 
             input_value = request.POST.get('value')
 
-            print(f'[82] PASSOU POR AQUI {input_value}')
             status, is_pupkey = RepositoryManager.new_repository(input_value)
 
             url = f'{env("GIT_USER")}@{env("DOMAIN")}:{env("GIT_PATH")}/{input_value}.{env("REPO_EXTENTION")}'
@@ -101,7 +145,7 @@ class PainelView(ListView):
                 return render(request, self.template_name, {'username': request.user.username, "repositorios": repositorio})
         
         elif repo is not None and name is None:
-            print('entrou')
+        
             RepositoryManager.remove_repository(repo)
             return HttpResponse('Repositório removido com sucesso!')
         else:
@@ -109,4 +153,3 @@ class PainelView(ListView):
             url = f'{env("GIT_USER")}@{env("DOMAIN")}:{env("GIT_PATH")}/{name}.{env("REPO_EXTENTION")}'
             return HttpResponse(url)
             
-# Create your views here.
