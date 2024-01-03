@@ -9,7 +9,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib import messages
 from git.managers import RepositoryManager
 from git.forms import UserForm
-from git.models import Repository
+from git.models import Repository, PullRequest, Release
 
 class LogoutView(ListView):
     template_name = 'auth/login.html'
@@ -21,7 +21,39 @@ class LogoutView(ListView):
         return redirect('/git/')
         #return render(request, self.template_name)
 
+class ReleaseView(ListView):
+    
+    template_name = 'auth/releases.html'
+    
+    def get(self, request, repository=None):
+        
+        if repository:
+            
+            rep = Repository.objects.get(name=repository)
+            
+            if rep:
+                
+                releases = Release.objects.filter(repository=rep)
+                return render(request, self.template_name, {'releases': releases})
 
+        return HttpResponse('Não encontrado!')
+    
+class PullRequestView(ListView):
+    template_name = 'auth/pull_request.html'
+
+    def get(self, request,  repository=None):
+        
+        if repository:
+            
+            rep = Repository.objects.get(name=repository)
+            
+            if rep:
+                
+                pull_requests = PullRequest.objects.filter(repository=rep)
+                return render(request, self.template_name, {'pull_requests': pull_requests})
+
+        return HttpResponse('Não encontrado!')
+        
 class LoginView(ListView):
     template_name = 'auth/login.html'
     model = User
@@ -79,7 +111,6 @@ class PainelView(ListView):
 
             input_value = request.POST.get('value')
 
-            print(f'[82] PASSOU POR AQUI {input_value}')
             status, is_pupkey = RepositoryManager.new_repository(input_value)
 
             url = f'{env("GIT_USER")}@{env("DOMAIN")}:{env("GIT_PATH")}/{input_value}.{env("REPO_EXTENTION")}'
@@ -109,4 +140,3 @@ class PainelView(ListView):
             url = f'{env("GIT_USER")}@{env("DOMAIN")}:{env("GIT_PATH")}/{name}.{env("REPO_EXTENTION")}'
             return HttpResponse(url)
             
-# Create your views here.

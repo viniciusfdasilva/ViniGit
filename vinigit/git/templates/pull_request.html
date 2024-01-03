@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+  <style>
+    .conteudo {
+      display:flex; /*<--*/
+    }
+
+    .div{
+      width: 50%;
+      background-color: #FF4500; 
+      height: 41px; 
+      width: 50%; 
+      border-top: 0px;
+    }
+    .tooltip {
+      position: relative;
+      display: inline-block;
+      border-bottom: 1px dotted black;
+    }
+    .ipsulum{
+      width: 50%;
+    }
+
+    .label{
+      padding: 10px;
+      font-size: 18px;
+      color: #111;
+    }
+
+    .copy-text{
+      position: relative;
+      padding: 10px;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      display: flex;
+    }
+
+    .copy-text input.text{
+      padding: 10px;
+      font-size: 18px;
+      color: #555;
+      border: none;
+      outline: none;
+    }
+
+    .copy-text button{
+      padding: 10px;
+      background: #FF4500;
+      color: #fff;
+      font-size: 18px;
+      border: none;
+      outline: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .copy-text button:active{
+      background-color: #FF4500;
+    }
+
+    .copy-text button:before{
+      content: "Copiado";
+      position: absolute;
+      top: -50px;
+      right: 0px;
+      background: #FF4500;
+      padding: 8px 10px;
+      border-radius: 20px;
+      font-size: 15px;
+      display: none;
+    }
+
+    .copy-text button:after{
+      content: "";
+      position: absolute;
+      top: -20px;
+      right: 25px;
+      width: 10px;
+      height: 10px;
+      background: #FF4500;
+      transform: rotate(45deg);
+      display: none;
+    }
+
+    .copy-text.active button:before,
+    .copy-text.active button::after{
+      display: block;
+    }
+  </style>
+
+  <body class="bg-light">
+    <div class="conteudo">
+    <div class="div">
+      <div style="margin-left: -570px">
+        <a href="#"><img class="d-block mx-auto mb-4" src="{% static 'img/git.png' %}" alt="" width="38" height="38"></a>
+      </div>
+    </div>
+    
+    <div class="div">
+      <div style="margin-left: 570px">
+        <a href="/git/logout"><img class="d-block mx-auto mb-4" src="{% static 'img/user.png' %}" alt="" width="60" height="40"></a>
+      </div>
+    </div>  
+    </div>
+    </div>
+    <div class="container">  
+      <div class="py-2 text-center">
+        <h2 class="text-center mb-1" style="color: gray;">Bem vindo(a) {{username}}</h2>
+      </div>
+    </div>
+       
+        <form method="POST" action="/git/painel">
+            {% csrf_token %}
+            <center>
+                <input type="text" class="form-control" name="value" id="value" style="width: 500px; height: 50px" placeholder="Nome do Repositório ou Chave pública" value="" required=""><br/>
+                <input class="form-control btn rounded submit px-3" style="background-color:#FF4500;font-family: Arial, Helvetica, sans-serif; font-size:smaller; color:white; font-size: 19px; width: 500px; height: 50px" value="Enviar" type="submit">
+            </center>
+            
+        </form>
+
+          <div><br/>
+            {% for message in messages %}                                    
+              <p style="background-color:#ffc6ad; font-family: Arial, Helvetica, sans-serif; font-size:smaller; color:#FF4500; text-align: center; border-radius: 10px; margin-left: 450px; margin-right: 450px;"><strong>{{message}}</strong></p>                                       
+            {% endfor %}
+          </div>
+          
+          <center>
+          <div id="input_container" class="copy-text copy-text" style="width: 720px;">
+          
+            
+        </div>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery-slim.min.js"><\/script>')</script>
+    <script src="../../assets/js/vendor/popper.min.js"></script>
+    <script src="../../dist/js/bootstrap.min.js"></script>
+    <script src="../../assets/js/vendor/holder.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+    <script>
+      window.CSRF_TOKEN = "{{ csrf_token }}"
+
+      $(".btn-danger:button").click(function() {
+        $('#modal').modal('show')
+        $('#button_modal').val(this.id)
+      })
+
+      function remove(){
+        $.post("/git/painel", {id_repo: $('#button_modal').val(), csrfmiddlewaretoken: window.CSRF_TOKEN}, function(response) {
+          alert(response)
+          location.href = ""
+        })
+      }
+
+      $(".text-white:button").click(function() {
+        $.post("/git/painel", {id: this.id, csrfmiddlewaretoken: window.CSRF_TOKEN}, function(response) {
+          $("#url").remove()
+          $("#botao").remove()
+          $("#item_click").remove()
+          $("#br_value").remove()
+
+          command = response
+          
+          $("#input_container").append(
+            '<br id="br_value"/><input id="url" type="text" class="text" value='+ command +' style="width: 900px;"><button id="botao" style="border-right: 500px;"><i id="item_click" class="fa fa-clone"></i></button>')
+          
+            let copyText = document.querySelector(".copy-text");
+            copyText.querySelector("#botao").addEventListener("click", function(){
+
+            let input = copyText.querySelector("#url.text");
+            input.select();
+            document.execCommand("copy")
+            copyText.classList.add("active")
+            window.getSelection().removeAllRanges();
+
+            setTimeout(function(){
+              copyText.classList.remove("active");
+            }, 1000);
+          });
+        });
+      })
+
+      let copyText = document.querySelector(".copy-text");
+      copyText.querySelector("#botao").addEventListener("click", function(){
+
+        let input = copyText.querySelector("#url.text");
+        input.select();
+        document.execCommand("copy")
+        copyText.classList.add("active")
+        window.getSelection().removeAllRanges();
+
+        setTimeout(function(){
+          copyText.classList.remove("active");
+        }, 1000);
+      });
+    </script>
+
+    <div id="modal" class="modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Excluir repositório</h5>
+            <a href="" type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </a>
+          </div>
+          <div class="modal-body">
+            <center><span>Tem certeza que deseja remover este repositório?</span></center>
+          </div>
+          <div class="modal-footer">
+            <button id="button_modal" onclick="remove()" type="button" class="btn text-white" style="background-color: #FF4500;">Sim</button>
+            <a href="" type="button" class="btn btn-secondary" data-dismiss="modal">Não</a>
+          </div>
+        </div>
+      </div>
+    </div>
+</body>
+{% endblock %}

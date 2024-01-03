@@ -11,10 +11,12 @@ class RepositoryManager():
         rep = Repository.objects.get(pk=id)
         
         try:
-           
-            path = f'{env("GIT_PATH")}/{rep.nome}.{env("REPO_EXTENTION")}'
-            os.system(f'rm -r {path}')
-            rep.delete()
+            if rep:
+                
+                path = f'{env("GIT_PATH")}/{rep.nome}.{env("REPO_EXTENTION")}'
+                os.system(f'rm -r {path}')
+                rep.delete()
+                
         except OSError as e:
             
             rep.delete()
