@@ -21,9 +21,22 @@ class LogoutView(ListView):
         return redirect('/git/')
         #return render(request, self.template_name)
 
+
+class ReleaseDetailView(ListView):
+    
+    template_name = 'release_detail.html'
+    
+    def get(self, request, repository=None, id_release=None):
+        pass
+    
+class PullRequestDetailView(ListView):
+    template_name = 'pullrequest_detail.html'
+
+    def get(self, request, repository=None, id_pullrequest=None):
+        pass
 class ReleaseView(ListView):
     
-    template_name = 'auth/releases.html'
+    template_name = 'releases.html'
     
     def get(self, request, repository=None):
         
@@ -39,7 +52,7 @@ class ReleaseView(ListView):
         return HttpResponse('Não encontrado!')
     
 class PullRequestView(ListView):
-    template_name = 'auth/pull_request.html'
+    template_name = 'pull_request.html'
 
     def get(self, request,  repository=None):
         
